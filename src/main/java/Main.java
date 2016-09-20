@@ -32,7 +32,8 @@ public class Main {
         List<WebElement> allResultsTitles = driver.findElements(searchResultsTitleLocator);
 
         for(WebElement eachResultTitle : allResultsTitles) {
-            System.out.println("Title: " + eachResultTitle.getText() + "\nLink: " + eachResultTitle.getAttribute("href") + "\n");
+            System.out.println("Title: " + eachResultTitle.getText());
+            System.out.println("Link: " + eachResultTitle.getAttribute("href") + "\n");
         }
 
         driver.quit();
