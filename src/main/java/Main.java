@@ -29,10 +29,10 @@ public class Main {
         String pageTitle = driver.getTitle();
         System.out.println("Page Title: " + pageTitle);
 
-        List<WebElement> allSearchResults = driver.findElements(searchResultsTitleLocator);
+        List<WebElement> allResultsTitles = driver.findElements(searchResultsTitleLocator);
 
-        for(WebElement eachResult : allSearchResults) {
-            System.out.println("Title: " + eachResult.getText() + "\nLink: " + eachResult.getAttribute("href") + "\n");
+        for(WebElement eachResltTitle : allResultsTitles) {
+            System.out.println("Title: " + eachResltTitle.getText() + "\nLink: " + eachResltTitle.getAttribute("href") + "\n");
         }
 
         driver.quit();
