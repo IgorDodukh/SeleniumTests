@@ -33,11 +33,6 @@ public class Main {
 //        System.out.println("t1: " + desc);
 //    }
 
-    @Test(dataProvider="getData")
-    public void instanceDbProvider(String keyword) {
-        System.out.println("Keywords for test: " + keyword);
-    }
-
     @DataProvider
         public Object[][] getData() throws IOException {
         int numLines = 0;
