@@ -1,0 +1,9 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="TestNgParametersSuite" parallel="false">
+    <parameter name="exampleDesc" value="10"/>
+    <test name="Test 1">
+        <classes>
+            <class name="Main" />
+        </classes>
+    </test>
+</suite>

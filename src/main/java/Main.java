@@ -5,10 +5,9 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.testng.Assert;
+import org.testng.Reporter;
+import org.testng.annotations.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,21 +26,66 @@ public class Main {
         driver = new FirefoxDriver();
     }
 
-//    @Parameters("exampleDesc")
-//    @Test
-//    public void t1(@Optional("TestNG Examples") String desc) {
-//        System.out.println("t1: " + desc);
-//    }
+    @Parameters({"exampleDesc"})
+    @Test
+    public void t1( String desc) {
+        System.out.println("d1: " + desc);
+    }
+
+    @Test(dataProvider="getData")
+    public void firstTest(String testData) {
+        By searchFieldLocator = By.xpath("//input[@class='b_searchbox']");
+        By bingLogoLocator = By.xpath("//div[@id='sbox']/div[1]");
+        By searchResultsTitleLocator = By.cssSelector("ol li h2>a");
+
+        String url = "http://www.bing.com/";
+        String resultTitle;
+
+        driver.get(url);
+        Reporter.log("Navigating to: " + url);
+
+        WebElement searchField = driver.findElement(searchFieldLocator);
+        String logoText = driver.findElement(bingLogoLocator).getText();
+
+        System.out.println(logoText + ": ");
+
+        searchField.sendKeys(testData);
+        Reporter.log("Input '" + testData + "' value to the search field");
+
+        searchField.submit();
+        Reporter.log("Start searching results");
+
+        Wait<WebDriver> wait = new WebDriverWait(driver, 10).withMessage("Search results not found.");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(searchResultsTitleLocator));
+
+        String resultsPageTitle = driver.getTitle();
+        System.out.println("Page Title: " + resultsPageTitle);
+
+        Assert.assertTrue(resultsPageTitle.contains(testData), "Page title doesn't contain searching value.");
+
+        List<WebElement> allResultsTitles = driver.findElements(searchResultsTitleLocator);
+        for(WebElement eachResultTitle : allResultsTitles) {
+            resultTitle = eachResultTitle.getText().toLowerCase();
+            Assert.assertTrue(resultTitle.contains(testData),
+                    "'" + resultTitle + "'" + " result doesn't contain '" + testData + "' phrase.");
+
+            System.out.println("Title: " + resultTitle);
+            System.out.println("Link: " + eachResultTitle.getAttribute("href") + "\n");
+        }
+    }
+
+    @AfterClass
+    public void tearDown(){
+        driver.quit();
+    }
 
     @DataProvider
-        public Object[][] getData() throws IOException {
+    public Object[][] getData() throws IOException {
         int numLines = 0;
         int currentLine = 0;
         String rowValue;
 
-        File file = new File("C:\\appFiles\\file.txt");
-
-        //counting lines from file
+        String file = new File("src\\main\\resources\\file.txt").getAbsolutePath();
         BufferedReader br = new BufferedReader(new FileReader(file));
         while ((br.readLine()) != null){
             numLines++;
@@ -56,42 +100,6 @@ public class Main {
         }
         br2.close();
         return testData;
-        }
-
-    @Test(dataProvider="getData")
-    public void firstTest(String testData) {
-        System.out.println("The Test");
-        By searchFieldLocator = By.xpath("//input[@class='b_searchbox']");
-        By bingLogoLocator = By.xpath("//div[@id='sbox']/div[1]");
-        By searchResultsTitleLocator = By.cssSelector("ol li h2>a");
-
-        driver.get("http://www.bing.com/");
-
-        WebElement searchField = driver.findElement(searchFieldLocator);
-        String logoText = driver.findElement(bingLogoLocator).getText();
-
-        System.out.println(logoText + ": ");
-
-        searchField.sendKeys(testData);
-        searchField.submit();
-
-        Wait<WebDriver> wait = new WebDriverWait(driver, 10).withMessage("Search results not found");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(searchResultsTitleLocator));
-
-        String resultsPageTitle = driver.getTitle();
-        System.out.println("Page Title: " + resultsPageTitle);
-
-        List<WebElement> allResultsTitles = driver.findElements(searchResultsTitleLocator);
-
-        for(WebElement eachResultTitle : allResultsTitles) {
-            System.out.println("Title: " + eachResultTitle.getText());
-            System.out.println("Link: " + eachResultTitle.getAttribute("href") + "\n");
-        }
-    }
-
-    @AfterClass
-    public void tearDown(){
-        driver.quit();
     }
 
 }
