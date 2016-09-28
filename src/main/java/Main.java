@@ -26,10 +26,10 @@ public class Main {
         driver = new FirefoxDriver();
     }
 
-    @Parameters({"exampleDesc"})
+    @Parameters("minResults")
     @Test
-    public void t1( String desc) {
-        System.out.println("d1: " + desc);
+    public void a(String param) {
+        System.out.println("VV--" + param);
     }
 
     @Test(dataProvider="getData")

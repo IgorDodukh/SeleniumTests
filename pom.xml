@@ -31,7 +31,7 @@
                 <configuration>
                     <suiteXmlFiles>
                         <suiteXmlFile>
-                            config{$file.separator}testng.xml
+                            config/suit.xml
                         </suiteXmlFile>
                     </suiteXmlFiles>
                 </configuration>
