@@ -64,6 +64,9 @@ public class Main {
         String resultsPageTitle = driver.getTitle();
         System.out.println("Page Title: " + resultsPageTitle);
 
+        log("Checking Page title to contain searching value");
+        Assert.assertTrue(resultsPageTitle.contains(testData), "Page title doesn't contain searching value");
+
         log("Getting number of found search results");
         String foundResultsString = driver.findElement(searchResultsQuantityLocator).getText();
 
@@ -74,9 +77,6 @@ public class Main {
             foundResultsString = foundResultsString.replace("результаты: ", "");
         }
         foundResultsQuantity = Integer.valueOf(foundResultsString);
-
-        log("Checking Page title to contain searching value");
-        Assert.assertTrue(resultsPageTitle.contains(testData), "Page title doesn't contain searching value");
 
         log("Checking number of found results (" + foundResultsQuantity + ")to be less than (" + searchResultsQuantity + ")");
         Assert.assertTrue(foundResultsQuantity >= searchResultsQuantity,
