@@ -1,9 +1,14 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
 <suite name="Suite" verbose="1">
     <test name="test1">
-        <parameter name="minResults" value="200000"/>
+        <parameter name="minResults" value="20000"/>
         <classes>
-            <class name="Main"/>
+            <class name="Main">
+                <methods>
+                    <include name="firstTest"/>
+                    <include name="secondTest"/>
+                </methods>
+            </class>
         </classes>
     </test>
 </suite>

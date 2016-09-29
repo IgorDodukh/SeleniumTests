@@ -1,4 +1,5 @@
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -19,6 +20,14 @@ import java.util.List;
  * Created by Ihor on 9/21/2016. All rights reserved!
  */
 public class Main {
+    By searchFieldLocator = By.xpath("//input[@class='b_searchbox']");
+    By bingLogoLocator = By.xpath("//div[@id='sbox']/div[1]");
+    By searchResultsTitleLocator = By.cssSelector("ol li h2>a");
+    By searchResultsQuantityLocator = By.xpath("//div[@id='b_tween']//span");
+    By similarRequestsBlockLocator = By.xpath("//li/ul[@class='b_vList']");
+    By similarRequestsLinksLocator = By.xpath("//li/ul[@class='b_vList']/li/a");
+
+
     WebDriver driver;
     int searchResultsQuantity;
     int foundResultsQuantity;
@@ -32,11 +41,6 @@ public class Main {
 
     @Test(dataProvider="getData")
     public void firstTest(String testData) {
-        By searchFieldLocator = By.xpath("//input[@class='b_searchbox']");
-        By bingLogoLocator = By.xpath("//div[@id='sbox']/div[1]");
-        By searchResultsTitleLocator = By.cssSelector("ol li h2>a");
-        By searchResultsQuantityLocator = By.xpath("//div[@id='b_tween']//span");
-
         String url = "http://www.bing.com/";
         String resultTitle;
 
@@ -55,9 +59,7 @@ public class Main {
         log("Start searching results");
         searchField.submit();
 
-
-        Wait<WebDriver> wait = new WebDriverWait(driver, 10).withMessage("Search results not found");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(searchResultsTitleLocator));
+        explicitWait(searchResultsTitleLocator, "Search results not found");
 
         log("Getting page title value");
         String resultsPageTitle = driver.getTitle();
@@ -71,13 +73,16 @@ public class Main {
 
         foundResultsString = foundResultsString.replace(",", "");
         try {
-            foundResultsString = foundResultsString.replace(" RESULTS", "");
-        } catch (NumberFormatException e) {
+            Assert.assertEquals(foundResultsString.charAt(0), "р");
             foundResultsString = foundResultsString.replace("результаты: ", "");
+
+        } catch (AssertionError e) {
+            System.out.println("---Exception message: ");
+            foundResultsString = foundResultsString.replace(" RESULTS", "");
         }
         foundResultsQuantity = Integer.valueOf(foundResultsString);
 
-        log("Checking number of found results (" + foundResultsQuantity + ")to be less than (" + searchResultsQuantity + ")");
+        log("Checking number of found results to be less than expect");
         Assert.assertTrue(foundResultsQuantity >= searchResultsQuantity,
                 "Number of found results is " + foundResultsQuantity +  ", it's less than " + searchResultsQuantity);
 
@@ -93,6 +98,11 @@ public class Main {
         }
     }
 
+    private void explicitWait(By locator, String textMessage) {
+        Wait<WebDriver> wait = new WebDriverWait(driver, 10).withMessage(textMessage);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+    }
+
     @AfterClass
     public void tearDown(){
         driver.quit();
@@ -102,8 +112,12 @@ public class Main {
     public Object[][] getData() throws IOException {
         int numLines = 0;
         int currentLine = 0;
-        String rowValue;
 
+        return getRowsFromFile(numLines, currentLine);
+    }
+
+    private String[][] getRowsFromFile(int numLines, int currentLine) throws IOException {
+        String rowValue;
         String file = new File("src" + File.separator + "main" + File.separator +
                 "resources" + File.separator + "file.txt").getAbsolutePath();
         BufferedReader br = new BufferedReader(new FileReader(file));
@@ -120,6 +134,16 @@ public class Main {
         }
         br2.close();
         return testData;
+    }
+
+    public boolean isElementPresent(WebDriver driver, By locator) {
+        try {
+            driver.findElement(locator);
+            return true;
+        } catch (NoSuchElementException e) {
+            log("Searching element '" + driver.findElement(locator) + "' was not found");
+            return false;
+        }
     }
 
     private void log(String logMessage) {
