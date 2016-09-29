@@ -20,16 +20,15 @@ import java.util.List;
  */
 public class Main {
     WebDriver driver;
+    int searchResultsQuantity;
+    int foundResultsQuantity;
 
-    @BeforeClass
-    public void setUp(){
-        driver = new FirefoxDriver();
-    }
 
     @Parameters("minResults")
-    @Test
-    public void a(String param) {
-        System.out.println("VV--" + param);
+    @BeforeClass
+    public void setUp(int parameterValue){
+        driver = new FirefoxDriver();
+        searchResultsQuantity = parameterValue;
     }
 
     @Test(dataProvider="getData")
@@ -37,32 +36,53 @@ public class Main {
         By searchFieldLocator = By.xpath("//input[@class='b_searchbox']");
         By bingLogoLocator = By.xpath("//div[@id='sbox']/div[1]");
         By searchResultsTitleLocator = By.cssSelector("ol li h2>a");
+        By searchResultsQuantityLocator = By.xpath("//div[@id='b_tween']//span");
 
         String url = "http://www.bing.com/";
         String resultTitle;
 
+        log("Navigate to: " + url);
         driver.get(url);
-        Reporter.log("Navigating to: " + url);
 
         WebElement searchField = driver.findElement(searchFieldLocator);
-        String logoText = driver.findElement(bingLogoLocator).getText();
 
-        System.out.println(logoText + ": ");
+        log("Checking site logo");
+        String siteLogo = driver.findElement(bingLogoLocator).getText();
+        Assert.assertEquals(siteLogo, "Bing", "Site logo has not expected value");
 
+        log("Input '" + testData + "' value to the search field.");
         searchField.sendKeys(testData);
-        Reporter.log("Input '" + testData + "' value to the search field");
 
+        log("Start searching results");
         searchField.submit();
-        Reporter.log("Start searching results");
 
-        Wait<WebDriver> wait = new WebDriverWait(driver, 10).withMessage("Search results not found.");
+
+        Wait<WebDriver> wait = new WebDriverWait(driver, 10).withMessage("Search results not found");
         wait.until(ExpectedConditions.visibilityOfElementLocated(searchResultsTitleLocator));
 
+        log("Getting page title value");
         String resultsPageTitle = driver.getTitle();
         System.out.println("Page Title: " + resultsPageTitle);
 
-        Assert.assertTrue(resultsPageTitle.contains(testData), "Page title doesn't contain searching value.");
+        log("Getting number of found search results");
+        String foundResultsString = driver.findElement(searchResultsQuantityLocator).getText();
 
+        foundResultsString = foundResultsString.replace(",", "");
+        try {
+            foundResultsString = foundResultsString.replace(" RESULTS", "");
+        } catch (NumberFormatException e) {
+            foundResultsString = foundResultsString.replace("результаты: ", "");
+        }
+        foundResultsQuantity = Integer.valueOf(foundResultsString);
+
+        log("Checking Page title to contain searching value");
+        Assert.assertTrue(resultsPageTitle.contains(testData), "Page title doesn't contain searching value");
+
+        log("Checking number of found results (" + foundResultsQuantity + ")to be less than (" + searchResultsQuantity + ")");
+        Assert.assertTrue(foundResultsQuantity >= searchResultsQuantity,
+                "Number of found results is " + foundResultsQuantity +  ", it's less than " + searchResultsQuantity);
+
+        log("Getting titles and links of the all found values on the page");
         List<WebElement> allResultsTitles = driver.findElements(searchResultsTitleLocator);
         for(WebElement eachResultTitle : allResultsTitles) {
             resultTitle = eachResultTitle.getText().toLowerCase();
@@ -100,6 +120,10 @@ public class Main {
         }
         br2.close();
         return testData;
+    }
+
+    private void log(String logMessage) {
+        Reporter.log(logMessage + "<br>");
     }
 
 }

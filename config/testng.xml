@@ -3,12 +3,7 @@
     <test name="test1">
         <parameter name="minResults" value="200000"/>
         <classes>
-            <class name="Main">
-                <methods>
-                    <include name="firstTest"/>
-                    <include name="a"/>
-                </methods>
-            </class>
+            <class name="Main"/>
         </classes>
     </test>
 </suite>
