@@ -23,7 +23,6 @@ public class Main {
     int searchResultsQuantity;
     int foundResultsQuantity;
 
-
     @Parameters("minResults")
     @BeforeClass
     public void setUp(int parameterValue){
@@ -105,7 +104,8 @@ public class Main {
         int currentLine = 0;
         String rowValue;
 
-        String file = new File("src\\main\\resources\\file.txt").getAbsolutePath();
+        String file = new File("src" + File.separator + "main" + File.separator +
+                "resources" + File.separator + "file.txt").getAbsolutePath();
         BufferedReader br = new BufferedReader(new FileReader(file));
         while ((br.readLine()) != null){
             numLines++;
