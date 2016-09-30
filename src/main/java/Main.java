@@ -73,7 +73,7 @@ public class Main {
 
         foundResultsString = foundResultsString.replace(",", "");
         try {
-            Assert.assertEquals(foundResultsString.charAt(0), "р");
+            Assert.assertEquals(foundResultsString.charAt(0), 'р');
             foundResultsString = foundResultsString.replace("результаты: ", "");
 
         } catch (AssertionError e) {
@@ -110,14 +110,14 @@ public class Main {
 
     @DataProvider
     public Object[][] getData() throws IOException {
-        int numLines = 0;
-        int currentLine = 0;
-
-        return getRowsFromFile(numLines, currentLine);
+        return getRowsFromFile();
     }
 
-    private String[][] getRowsFromFile(int numLines, int currentLine) throws IOException {
+    private String[][] getRowsFromFile() throws IOException {
+        int numLines = 0;
+        int currentLine = 0;
         String rowValue;
+
         String file = new File("src" + File.separator + "main" + File.separator +
                 "resources" + File.separator + "file.txt").getAbsolutePath();
         BufferedReader br = new BufferedReader(new FileReader(file));
