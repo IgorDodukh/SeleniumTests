@@ -173,8 +173,6 @@ public class Main {
         int resultsCount = allResultsTitles.size();
         int bIndex;
 
-//TODO check correct work of 'index' variable. Run test to the finish stage
-
         while(index < resultsCount){
             System.out.println("Index: " + index);
             System.out.println("All elements: " + resultsCount);
