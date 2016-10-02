@@ -1,3 +1,1 @@
-automation
-git
-oracle
+maven
