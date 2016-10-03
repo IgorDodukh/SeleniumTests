@@ -1,6 +1,7 @@
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
@@ -37,39 +38,35 @@ public class Main {
     int index = 0;
     String url = "http://www.bing.com/";
 
-    String driverPath = System.getProperty("driver.executable");
-    String browserFilename = System.getProperty("browser.executable");
+    String chromeDriverPath = System.getProperty("chrome.driver.executable");
+    String ieDriverPath = System.getProperty("ie.driver.executable");
+    String phantomjsDriverPath = System.getProperty("phantomjs.driver.executable");
     String browser = System.getProperty("browser");
 
     @Parameters("minResults")
     @BeforeClass
     public void setUp(int parameterValue){
 
-        System.out.println("driverPath: " + driverPath);
-        System.out.println("browserFilename: " + browserFilename);
-        if (driverPath == null) {
-            throw new SkipException("Path to WebDriver is not specified");
+        if (chromeDriverPath == null) {
+            throw new SkipException("Path to ChromeDriver is not specified");
         }
-//        if (browserFilename == null) {
-//            System.out.println("WebDriver filename is not specified");
-//            throw new SkipException("WebDriver filename is not specified");
-//        }
+        if (ieDriverPath == null) {
+            throw new SkipException("Path to IEDriver is not specified");
+        }
+        if (phantomjsDriverPath == null) {
+            throw new SkipException("Path to PhantomJSDriver is not specified");
+        }
 
         if(browser.equalsIgnoreCase("Firefox")){
-            System.setProperty("webdriver.firefox.driver", driverPath);
             driver=new FirefoxDriver();
         } else if(browser.equalsIgnoreCase("Chrome")) {
-            System.setProperty("webdriver.chrome.driver", driverPath);
+            System.setProperty("webdriver.chrome.driver", chromeDriverPath);
             driver=new ChromeDriver();
         } else if(browser.equalsIgnoreCase("IE")) {
-            System.setProperty("IEDriverServer.exe", browserFilename);
-
-            System.setProperty("webdriver.ie.driver", driverPath);
-            driver=new ChromeDriver();
+            System.setProperty("webdriver.ie.driver", ieDriverPath);
+            driver=new InternetExplorerDriver();
         } else if (browser.equalsIgnoreCase("Phantomjs")) {
-            System.setProperty("phantomjsdriver.exe", browserFilename);
-
-            System.setProperty("phantomjs.binary.path", driverPath);
+            System.setProperty("phantomjs.binary.path", phantomjsDriverPath);
             driver = new PhantomJSDriver();
         }
 

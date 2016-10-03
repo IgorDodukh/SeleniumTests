@@ -68,8 +68,10 @@
                         <!--</systemProperty>-->
                     <!--</systemProperties>-->
                     <systemPropertyVariables>
-                        <browser.executable>chromedriver.exe</browser.executable>
-                        <driver.executable>${project.build.outputDirectory}${file.separator}${browser.executable}</driver.executable>
+                        <!--<driver.executable>${project.build.outputDirectory}${file.separator}${browser.executable}</driver.executable>-->
+                        <chrome.driver.executable>${project.build.outputDirectory}${file.separator}chromedriver.exe</chrome.driver.executable>
+                        <phantomjs.driver.executable>${project.build.outputDirectory}${file.separator}phantomjs.exe</phantomjs.driver.executable>
+                        <ie.driver.executable>${project.build.outputDirectory}${file.separator}IEDriverServer.exe</ie.driver.executable>
                         <!--<driver.executable>${project.build.outputDirectory}${file.separator}chromedriver.exe</driver.executable>-->
                         <!--<driver.executable>${project.build.outputDirectory}${file.separator}phantomjsdriver.exe</driver.executable>-->
                         <!--<driver.executable>${project.build.outputDirectory}${file.separator}IEDriverServer.exe</driver.executable>-->
