@@ -8,10 +8,6 @@
     <artifactId>selenium-test</artifactId>
     <version>1.0-SNAPSHOT</version>
 
-    <!--<properties>-->
-        <!--<browser.executable>chromedriver.exe</browser.executable>-->
-    <!--</properties>-->
-
     <dependencies>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
@@ -61,20 +57,10 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.19.1</version>
                 <configuration>
-                    <!--<systemProperties>-->
-                        <!--<systemProperty>-->
-                            <!--<key>someKey</key>-->
-                            <!--<value>someValue</value>-->
-                        <!--</systemProperty>-->
-                    <!--</systemProperties>-->
                     <systemPropertyVariables>
-                        <!--<driver.executable>${project.build.outputDirectory}${file.separator}${browser.executable}</driver.executable>-->
                         <chrome.driver.executable>${project.build.outputDirectory}${file.separator}chromedriver.exe</chrome.driver.executable>
                         <phantomjs.driver.executable>${project.build.outputDirectory}${file.separator}phantomjs.exe</phantomjs.driver.executable>
                         <ie.driver.executable>${project.build.outputDirectory}${file.separator}IEDriverServer.exe</ie.driver.executable>
-                        <!--<driver.executable>${project.build.outputDirectory}${file.separator}chromedriver.exe</driver.executable>-->
-                        <!--<driver.executable>${project.build.outputDirectory}${file.separator}phantomjsdriver.exe</driver.executable>-->
-                        <!--<driver.executable>${project.build.outputDirectory}${file.separator}IEDriverServer.exe</driver.executable>-->
                     </systemPropertyVariables>
                     <suiteXmlFiles>
                         <suiteXmlFile>
