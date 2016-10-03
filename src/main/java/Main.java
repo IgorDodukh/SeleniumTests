@@ -1,10 +1,13 @@
 import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.Reporter;
+import org.testng.SkipException;
 import org.testng.annotations.*;
 
 import java.io.BufferedReader;
@@ -30,14 +33,46 @@ public class Main {
 
     WebDriver driver;
     int searchResultsQuantity;
-    int foundResultsQuantity;
+    double foundResultsQuantity;
     int index = 0;
     String url = "http://www.bing.com/";
+
+    String driverPath = System.getProperty("driver.executable");
+    String browserFilename = System.getProperty("browser.executable");
+    String browser = System.getProperty("browser");
 
     @Parameters("minResults")
     @BeforeClass
     public void setUp(int parameterValue){
-        driver = new FirefoxDriver();
+
+        System.out.println("driverPath: " + driverPath);
+        System.out.println("browserFilename: " + browserFilename);
+        if (driverPath == null) {
+            throw new SkipException("Path to WebDriver is not specified");
+        }
+//        if (browserFilename == null) {
+//            System.out.println("WebDriver filename is not specified");
+//            throw new SkipException("WebDriver filename is not specified");
+//        }
+
+        if(browser.equalsIgnoreCase("Firefox")){
+            System.setProperty("webdriver.firefox.driver", driverPath);
+            driver=new FirefoxDriver();
+        } else if(browser.equalsIgnoreCase("Chrome")) {
+            System.setProperty("webdriver.chrome.driver", driverPath);
+            driver=new ChromeDriver();
+        } else if(browser.equalsIgnoreCase("IE")) {
+            System.setProperty("IEDriverServer.exe", browserFilename);
+
+            System.setProperty("webdriver.ie.driver", driverPath);
+            driver=new ChromeDriver();
+        } else if (browser.equalsIgnoreCase("Phantomjs")) {
+            System.setProperty("phantomjsdriver.exe", browserFilename);
+
+            System.setProperty("phantomjs.binary.path", driverPath);
+            driver = new PhantomJSDriver();
+        }
+
         searchResultsQuantity = parameterValue;
     }
 
@@ -81,7 +116,7 @@ public class Main {
             System.out.println("Exception message: " + e.getMessage());
             foundResultsString = foundResultsString.replace(" RESULTS", "");
         }
-        foundResultsQuantity = Integer.valueOf(foundResultsString);
+        foundResultsQuantity = Double.valueOf(foundResultsString);
 
         log("Checking number of found results to be less than expect");
         Assert.assertTrue(foundResultsQuantity >= searchResultsQuantity,

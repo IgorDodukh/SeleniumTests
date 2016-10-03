@@ -8,6 +8,10 @@
     <artifactId>selenium-test</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <!--<properties>-->
+        <!--<browser.executable>chromedriver.exe</browser.executable>-->
+    <!--</properties>-->
+
     <dependencies>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
@@ -19,16 +23,57 @@
             <artifactId>testng</artifactId>
             <version>6.8</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-firefox-driver</artifactId>
+            <version>2.53.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-chrome-driver</artifactId>
+            <version>2.53.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-ie-driver</artifactId>
+            <version>2.53.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.codeborne</groupId>
+            <artifactId>phantomjsdriver</artifactId>
+            <version>1.3.0</version>
+        </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.19.1</version>
                 <configuration>
+                    <!--<systemProperties>-->
+                        <!--<systemProperty>-->
+                            <!--<key>someKey</key>-->
+                            <!--<value>someValue</value>-->
+                        <!--</systemProperty>-->
+                    <!--</systemProperties>-->
+                    <systemPropertyVariables>
+                        <browser.executable>chromedriver.exe</browser.executable>
+                        <driver.executable>${project.build.outputDirectory}${file.separator}${browser.executable}</driver.executable>
+                        <!--<driver.executable>${project.build.outputDirectory}${file.separator}chromedriver.exe</driver.executable>-->
+                        <!--<driver.executable>${project.build.outputDirectory}${file.separator}phantomjsdriver.exe</driver.executable>-->
+                        <!--<driver.executable>${project.build.outputDirectory}${file.separator}IEDriverServer.exe</driver.executable>-->
+                    </systemPropertyVariables>
                     <suiteXmlFiles>
                         <suiteXmlFile>
                             config${file.separator}testng.xml
