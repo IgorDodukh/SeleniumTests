@@ -46,6 +46,7 @@
                         <chrome.driver.executable>${project.build.outputDirectory}${file.separator}chromedriver.exe</chrome.driver.executable>
                         <phantomjs.driver.executable>${project.build.outputDirectory}${file.separator}phantomjs.exe</phantomjs.driver.executable>
                         <ie.driver.executable>${project.build.outputDirectory}${file.separator}IEDriverServer.exe</ie.driver.executable>
+                        <selenium.hub.url></selenium.hub.url>
                     </systemPropertyVariables>
                     <suiteXmlFiles>
                         <suiteXmlFile>

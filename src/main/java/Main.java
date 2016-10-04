@@ -3,6 +3,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -15,6 +17,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -42,32 +46,47 @@ public class Main {
     String ieDriverPath = System.getProperty("ie.driver.executable");
     String phantomjsDriverPath = System.getProperty("phantomjs.driver.executable");
     String browser = System.getProperty("browser");
+    String hubUrl = System.getProperty("hubUrl");
 
     @Parameters("minResults")
     @BeforeClass
     public void setUp(int parameterValue){
 
-        if (chromeDriverPath == null) {
-            throw new SkipException("Path to ChromeDriver is not specified");
-        }
-        if (ieDriverPath == null) {
-            throw new SkipException("Path to IEDriver is not specified");
-        }
-        if (phantomjsDriverPath == null) {
-            throw new SkipException("Path to PhantomJSDriver is not specified");
-        }
+// if run the test without any parameters - firefox driver will be used by default
+// if run the test with specifying a browser using -Dbrowser - specified webdriver will be used
+// if run the test with specifying a URL for selenium hub using -DhubUrl - test will be started on the selected hub
+        try {
+            if (hubUrl != null)
+            System.setProperty("webdriver.chrome.driver", hubUrl);
+            DesiredCapabilities capabilities = DesiredCapabilities.phantomjs();
+            driver = new RemoteWebDriver(new URL(hubUrl), capabilities);
+        } catch (MalformedURLException e) {
+            System.out.println("---URL is not specified:) blablablaaa");
+            e.printStackTrace();
+            if (chromeDriverPath == null) {
+                throw new SkipException("Path to ChromeDriver is not specified");
+            }
+            if (ieDriverPath == null) {
+                throw new SkipException("Path to IEDriver is not specified");
+            }
+            if (phantomjsDriverPath == null) {
+                throw new SkipException("Path to PhantomJSDriver is not specified");
+            }
 
-        if(browser.equalsIgnoreCase("Firefox")){
-            driver=new FirefoxDriver();
-        } else if(browser.equalsIgnoreCase("Chrome")) {
-            System.setProperty("webdriver.chrome.driver", chromeDriverPath);
-            driver=new ChromeDriver();
-        } else if(browser.equalsIgnoreCase("IE")) {
-            System.setProperty("webdriver.ie.driver", ieDriverPath);
-            driver=new InternetExplorerDriver();
-        } else if (browser.equalsIgnoreCase("Phantomjs")) {
-            System.setProperty("phantomjs.binary.path", phantomjsDriverPath);
-            driver = new PhantomJSDriver();
+            if (browser != null){
+                if(browser.equalsIgnoreCase("Firefox")){
+                    driver=new FirefoxDriver();
+                } else if(browser.equalsIgnoreCase("Chrome")) {
+                    System.setProperty("webdriver.chrome.driver", chromeDriverPath);
+                    driver=new ChromeDriver();
+                } else if(browser.equalsIgnoreCase("IE")) {
+                    System.setProperty("webdriver.ie.driver", ieDriverPath);
+                    driver=new InternetExplorerDriver();
+                } else if (browser.equalsIgnoreCase("Phantomjs")) {
+                    System.setProperty("phantomjs.binary.path", phantomjsDriverPath);
+                    driver = new PhantomJSDriver();
+                }
+            } else driver=new FirefoxDriver();
         }
 
         searchResultsQuantity = parameterValue;
