@@ -47,6 +47,8 @@ public class Main {
     String phantomjsDriverPath = System.getProperty("phantomjs.driver.executable");
     String browser = System.getProperty("browser");
     String hubUrl = System.getProperty("hubUrl");
+    String reportsDirectory = System.getProperty("reportsDirectory");
+    String reportsPath = System.getProperty("reportsPath");
 
     @Parameters("minResults")
     @BeforeClass
@@ -57,12 +59,11 @@ public class Main {
 // if run the test with specifying a URL for selenium hub using -DhubUrl - test will be started on the selected hub
         try {
             if (hubUrl != null)
-            System.setProperty("webdriver.chrome.driver", hubUrl);
+                System.setProperty("webdriver.chrome.driver", hubUrl);
             DesiredCapabilities capabilities = DesiredCapabilities.phantomjs();
             driver = new RemoteWebDriver(new URL(hubUrl), capabilities);
         } catch (MalformedURLException e) {
-            System.out.println("---URL is not specified:) blablablaaa");
-            e.printStackTrace();
+            System.out.println("---URL is not specified :)");
             if (chromeDriverPath == null) {
                 throw new SkipException("Path to ChromeDriver is not specified");
             }
@@ -73,20 +74,20 @@ public class Main {
                 throw new SkipException("Path to PhantomJSDriver is not specified");
             }
 
-            if (browser != null){
-                if(browser.equalsIgnoreCase("Firefox")){
-                    driver=new FirefoxDriver();
-                } else if(browser.equalsIgnoreCase("Chrome")) {
+            if (browser != null) {
+                if (browser.equalsIgnoreCase("Firefox")) {
+                    driver = new FirefoxDriver();
+                } else if (browser.equalsIgnoreCase("Chrome")) {
                     System.setProperty("webdriver.chrome.driver", chromeDriverPath);
-                    driver=new ChromeDriver();
-                } else if(browser.equalsIgnoreCase("IE")) {
+                    driver = new ChromeDriver();
+                } else if (browser.equalsIgnoreCase("IE")) {
                     System.setProperty("webdriver.ie.driver", ieDriverPath);
-                    driver=new InternetExplorerDriver();
+                    driver = new InternetExplorerDriver();
                 } else if (browser.equalsIgnoreCase("Phantomjs")) {
                     System.setProperty("phantomjs.binary.path", phantomjsDriverPath);
                     driver = new PhantomJSDriver();
                 }
-            } else driver=new FirefoxDriver();
+            } else driver = new FirefoxDriver();
         }
 
         searchResultsQuantity = parameterValue;
@@ -207,6 +208,11 @@ public class Main {
 
     @AfterClass
     public void tearDown(){
+        if (reportsPath != null) {
+            reportsDirectory = reportsPath;
+            System.setProperty("reportsDirectory", reportsDirectory);
+        }
+
         driver.quit();
     }
 

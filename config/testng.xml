@@ -2,18 +2,22 @@
 <suite name="Suite" verbose="1">
     <test name="test1">
         <parameter name="minResults" value="20000"/>
-        <!--<groups>-->
-            <!--<run>-->
-                <!--<include name="${browser}"/>-->
-            <!--</run>-->
-        <!--</groups>-->
         <classes>
             <class name="Main">
                 <methods>
                     <include name="firstTest"/>
-                    <include name="secondTest"/>
                 </methods>
             </class>
         </classes>
     </test>
+    <!--<test name="test2">-->
+        <!--<parameter name="minResults" value="20000"/>-->
+        <!--<classes>-->
+            <!--<class name="Main">-->
+                <!--<methods>-->
+                    <!--<include name="secondTest"/>-->
+                <!--</methods>-->
+            <!--</class>-->
+        <!--</classes>-->
+    <!--</test>-->
 </suite>
