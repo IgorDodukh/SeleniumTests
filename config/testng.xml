@@ -10,14 +10,14 @@
             </class>
         </classes>
     </test>
-    <!--<test name="test2">-->
-        <!--<parameter name="minResults" value="20000"/>-->
-        <!--<classes>-->
-            <!--<class name="Main">-->
-                <!--<methods>-->
-                    <!--<include name="secondTest"/>-->
-                <!--</methods>-->
-            <!--</class>-->
-        <!--</classes>-->
-    <!--</test>-->
+    <test name="test2">
+        <parameter name="minResults" value="20000"/>
+        <classes>
+            <class name="Main">
+                <methods>
+                    <include name="secondTest"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
 </suite>
