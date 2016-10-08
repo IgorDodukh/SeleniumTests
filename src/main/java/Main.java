@@ -1,5 +1,6 @@
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
@@ -19,7 +20,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -28,7 +31,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class Main {
     By searchFieldLocator = By.xpath("//input[@class='b_searchbox']");
+    By mobileSearchFieldLocator = By.xpath("//input[@id='sb_form_q']");
     By bingLogoLocator = By.xpath("//div[@id='sbox']/div[1]");
+    By mobileBingLogoLocator = By.xpath("//img[@id='bLogoExp']");
     By searchResultsTitleLocator = By.cssSelector("ol li h2>a");
     By searchResultsLinkLocator = By.cssSelector("ol li div>cite");
     By cachedPageLinkLocator = By.xpath("//div[@class='b_vPanel']//strong/a");
@@ -40,6 +45,7 @@ public class Main {
     int searchResultsQuantity;
     double foundResultsQuantity;
     int index = 0;
+    boolean isMobileVersion;
     String url = "http://www.bing.com/";
 
     String chromeDriverPath = System.getProperty("chrome.driver.executable");
@@ -86,6 +92,17 @@ public class Main {
                 } else if (browser.equalsIgnoreCase("Phantomjs")) {
                     System.setProperty("phantomjs.binary.path", phantomjsDriverPath);
                     driver = new PhantomJSDriver();
+                } else if (browser.equalsIgnoreCase("selendroid")) {
+                    driver = new RemoteWebDriver(DesiredCapabilities.android());
+                } else if (browser.equalsIgnoreCase("chromeEmulator")) {
+                    Map<String, String> mobileEmulation = new HashMap<String, String>();
+                    mobileEmulation.put("deviceName", "Google Nexus 5");
+
+                    Map<String, Object> chromeOptions = new HashMap<String, Object>();
+                    chromeOptions.put("mobileEmulation", mobileEmulation);
+                    DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+                    capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
+                    driver = new ChromeDriver(capabilities);
                 }
             } else driver = new FirefoxDriver();
         }
@@ -99,12 +116,24 @@ public class Main {
 
         log("Navigate to: " + url);
         driver.get(url);
+        WebElement searchField;
+        try {
+            searchField = driver.findElement(searchFieldLocator);
+            System.out.println("Desktop version");
+            isMobileVersion = false;
 
-        WebElement searchField = driver.findElement(searchFieldLocator);
+            log("Checking site logo");
+            String siteLogo = driver.findElement(bingLogoLocator).getText();
+            Assert.assertEquals(siteLogo, "Bing", "Site logo has not expected value");
+        } catch (NoSuchElementException e) {
+            searchField = driver.findElement(mobileSearchFieldLocator);
+            System.out.println("Mobile version");
+            isMobileVersion = true;
 
-        log("Checking site logo");
-        String siteLogo = driver.findElement(bingLogoLocator).getText();
-        Assert.assertEquals(siteLogo, "Bing", "Site logo has not expected value");
+            log("Checking site logo");
+            String siteLogo = driver.findElement(mobileBingLogoLocator).getAttribute("alt");
+            Assert.assertTrue(siteLogo.contains("Bing"), "Site logo has not expected value");
+        }
 
         log("Input '" + testData + "' value to the search field.");
         searchField.sendKeys(testData);
@@ -121,23 +150,25 @@ public class Main {
         log("Checking Page title to contain searching value");
         Assert.assertTrue(resultsPageTitle.contains(testData), "Page title doesn't contain searching value");
 
-        log("Getting number of found search results");
-        String foundResultsString = driver.findElement(searchResultsQuantityLocator).getText();
+        if (!isMobileVersion) {
+            log("Getting number of found search results");
+            String foundResultsString = driver.findElement(searchResultsQuantityLocator).getText();
+            foundResultsString = foundResultsString.replace(",", "");
+            try {
+                Assert.assertEquals(foundResultsString.charAt(0), 'р');
+                foundResultsString = foundResultsString.replace("результаты: ", "");
 
-        foundResultsString = foundResultsString.replace(",", "");
-        try {
-            Assert.assertEquals(foundResultsString.charAt(0), 'р');
-            foundResultsString = foundResultsString.replace("результаты: ", "");
+            } catch (AssertionError e) {
+                System.out.println("Exception message: " + e.getMessage());
+                foundResultsString = foundResultsString.replace(" RESULTS", "");
+            }
+            foundResultsQuantity = Double.valueOf(foundResultsString);
 
-        } catch (AssertionError e) {
-            System.out.println("Exception message: " + e.getMessage());
-            foundResultsString = foundResultsString.replace(" RESULTS", "");
-        }
-        foundResultsQuantity = Double.valueOf(foundResultsString);
+            log("Checking number of found results to be less than expect");
+            Assert.assertTrue(foundResultsQuantity >= searchResultsQuantity,
+                    "Number of found results is " + foundResultsQuantity +  ", it's less than " + searchResultsQuantity);
 
-        log("Checking number of found results to be less than expect");
-        Assert.assertTrue(foundResultsQuantity >= searchResultsQuantity,
-                "Number of found results is " + foundResultsQuantity +  ", it's less than " + searchResultsQuantity);
+        } else foundResultsQuantity = searchResultsQuantity + 1;
 
         log("Getting titles and links of the all found values on the page");
         List<WebElement> allResultsTitles = driver.findElements(searchResultsTitleLocator);
