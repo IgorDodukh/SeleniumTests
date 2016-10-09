@@ -95,6 +95,8 @@ public class Main {
                 } else if (browser.equalsIgnoreCase("selendroid")) {
                     driver = new RemoteWebDriver(DesiredCapabilities.android());
                 } else if (browser.equalsIgnoreCase("chromeEmulator")) {
+                    System.setProperty("webdriver.chrome.driver", chromeDriverPath);
+
                     Map<String, String> mobileEmulation = new HashMap<String, String>();
                     mobileEmulation.put("deviceName", "Google Nexus 5");
 
@@ -103,7 +105,7 @@ public class Main {
                     DesiredCapabilities capabilities = DesiredCapabilities.chrome();
                     capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
                     driver = new ChromeDriver(capabilities);
-                }
+                } else driver = new FirefoxDriver();
             } else driver = new FirefoxDriver();
         }
 
@@ -116,24 +118,8 @@ public class Main {
 
         log("Navigate to: " + url);
         driver.get(url);
-        WebElement searchField;
-        try {
-            searchField = driver.findElement(searchFieldLocator);
-            System.out.println("Desktop version");
-            isMobileVersion = false;
 
-            log("Checking site logo");
-            String siteLogo = driver.findElement(bingLogoLocator).getText();
-            Assert.assertEquals(siteLogo, "Bing", "Site logo has not expected value");
-        } catch (NoSuchElementException e) {
-            searchField = driver.findElement(mobileSearchFieldLocator);
-            System.out.println("Mobile version");
-            isMobileVersion = true;
-
-            log("Checking site logo");
-            String siteLogo = driver.findElement(mobileBingLogoLocator).getAttribute("alt");
-            Assert.assertTrue(siteLogo.contains("Bing"), "Site logo has not expected value");
-        }
+        WebElement searchField = recognizePageType();
 
         log("Input '" + testData + "' value to the search field.");
         searchField.sendKeys(testData);
@@ -182,15 +168,38 @@ public class Main {
         }
     }
 
+    private WebElement recognizePageType() {
+        WebElement searchField;
+        try {
+            searchField = driver.findElement(searchFieldLocator);
+            System.out.println("Desktop version");
+            isMobileVersion = false;
+
+            log("Checking site logo");
+            String siteLogo = driver.findElement(bingLogoLocator).getText();
+            Assert.assertEquals(siteLogo, "Bing", "Site logo has not expected value");
+        } catch (NoSuchElementException e) {
+            searchField = driver.findElement(mobileSearchFieldLocator);
+            System.out.println("Mobile version");
+            isMobileVersion = true;
+
+            log("Checking site logo");
+            String siteLogo = driver.findElement(mobileBingLogoLocator).getAttribute("alt");
+            Assert.assertTrue(siteLogo.contains("Bing"), "Site logo has not expected value");
+        }
+        return searchField;
+    }
+
     @Test(dataProvider = "getData")
-    public void secondTest(String testData) throws InterruptedException {
+    public void secondTest(String testData) throws InterruptedException, IOException {
         String selectedRandomValue;
         String currentSearchValue;
 
         log("Navigate to: " + url);
         driver.get(url);
 
-        WebElement searchField = driver.findElement(searchFieldLocator);
+        WebElement searchField = recognizePageType();
+//        WebElement searchField = driver.findElement(searchFieldLocator);
 
         log("Input '" + testData + "' value to the search field.");
         searchField.sendKeys(testData);
@@ -243,7 +252,6 @@ public class Main {
             reportsDirectory = reportsPath;
             System.setProperty("reportsDirectory", reportsDirectory);
         }
-
         driver.quit();
     }
 
@@ -255,7 +263,7 @@ public class Main {
         return getRowsFromFile(numLines, currentLine);
     }
 
-    private List<WebElement> linksChecker(List<WebElement> allResultsTitles, WebElement eachResultTitle) {
+    private List<WebElement> linksChecker(List<WebElement> allResultsTitles, WebElement eachResultTitle) throws IOException {
         String resultUrl;
         WebElement eachResultLink;
         int resultsCount = allResultsTitles.size();
